@@ -9,6 +9,9 @@ using HW_03WebII.Data;
 using HW_03WebII.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using System.Text.RegularExpressions;
+using System.Text;
+using System.Globalization;
 
 namespace HW_03WebII.Controllers
 {
@@ -32,7 +35,7 @@ namespace HW_03WebII.Controllers
         }
 
         // GET: BlogPost/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(string id)
         {
             if (id == null)
             {
@@ -65,6 +68,7 @@ namespace HW_03WebII.Controllers
         {
             if (ModelState.IsValid)
             {
+                GenerateSlug(blogPostModel);
                 _context.Add(blogPostModel);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -74,7 +78,7 @@ namespace HW_03WebII.Controllers
 
         // GET: BlogPost/Edit/5
         [Authorize(Policy = MyIdentityData.BlogPolicy_Edit)]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
             {
@@ -95,7 +99,7 @@ namespace HW_03WebII.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = MyIdentityData.BlogPolicy_Edit)]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Body,Summary,Posted")] BlogPostModel blogPostModel)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Title,Body,Summary,Posted")] BlogPostModel blogPostModel)
         {
             if (!id.Equals(blogPostModel.Id))
             {
@@ -127,7 +131,7 @@ namespace HW_03WebII.Controllers
 
         // GET: BlogPost/Delete/5
         [Authorize(Policy = MyIdentityData.BlogPolicy_Delete)]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
             {
@@ -148,7 +152,7 @@ namespace HW_03WebII.Controllers
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = MyIdentityData.BlogPolicy_Delete)]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var blogPostModel = await _context.BlogPosts.FindAsync(id);
             _context.BlogPosts.Remove(blogPostModel);
@@ -159,6 +163,47 @@ namespace HW_03WebII.Controllers
         private bool BlogPostModelExists(string id)
         {
             return _context.BlogPosts.Any(e => e.Id.Equals(id));
+        }
+
+
+
+        private bool GenerateSlug(BlogPostModel blogPost)
+        {
+            string str = RemoveDiacritics(blogPost.Title).ToLower();
+            // invalid chars           
+            str = Regex.Replace(str, @"[^a-z0-9\s-]", "");
+            // convert multiple spaces into one space   
+            str = Regex.Replace(str, @"\s+", " ").Trim();
+            // cut and trim 
+            str = str.Substring(0, str.Length <= 45 ? str.Length : 45).Trim();
+            str = Regex.Replace(str, @"\s", "-"); // hyphens 
+            blogPost.Id = str;  
+
+            //check if exists
+            int extraId = 0;
+            string id;
+            while (BlogPostModelExists(blogPost.Id))
+            {
+                id = blogPost.Id;
+                var numbers = Regex.Matches(blogPost.Id, @"\d+").ToList();
+                if (numbers.Any())
+                {
+                    var a = numbers.Last().ToString();
+                    int.TryParse(a, out extraId);
+                    extraId++;
+                }
+                blogPost.Id = blogPost.Id.Remove(blogPost.Id.Length - extraId.ToString().Length);
+                blogPost.Id = str + extraId;
+            }
+            return true;
+        }
+
+        private string RemoveDiacritics(string text)
+        {
+            var s = new string(text.Normalize(NormalizationForm.FormD)
+                .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                .ToArray());
+            return s.Normalize(NormalizationForm.FormC);
         }
     }
 }
