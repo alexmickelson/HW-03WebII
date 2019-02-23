@@ -7,21 +7,27 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HW_03WebII.Data;
 using HW_03WebII.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace HW_03WebII.Controllers
 {
     public class BlogPostController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private UserManager<IdentityUser> _userManager;
 
-        public BlogPostController(ApplicationDbContext context)
-        {
+        public BlogPostController(ApplicationDbContext context,  UserManager<IdentityUser> userManager)
+        { 
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: BlogPost
         public async Task<IActionResult> Index()
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+            //if (currentUser == null) return Challenge();
             return View(await _context.BlogPosts.ToListAsync());
         }
 
@@ -34,7 +40,7 @@ namespace HW_03WebII.Controllers
             }
 
             var blogPostModel = await _context.BlogPosts
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Id.Equals(id));
             if (blogPostModel == null)
             {
                 return NotFound();
@@ -44,6 +50,7 @@ namespace HW_03WebII.Controllers
         }
 
         // GET: BlogPost/Create
+        [Authorize (Policy =MyIdentityData.BlogPolicy_Add)]
         public IActionResult Create()
         {
             return View();
@@ -54,7 +61,7 @@ namespace HW_03WebII.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Body,Summary,Posted")] BlogPostModel blogPostModel)
+        public async Task<IActionResult> Create( BlogPostModel blogPostModel)
         {
             if (ModelState.IsValid)
             {
@@ -66,6 +73,7 @@ namespace HW_03WebII.Controllers
         }
 
         // GET: BlogPost/Edit/5
+        [Authorize(Policy = MyIdentityData.BlogPolicy_Edit)]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,9 +94,10 @@ namespace HW_03WebII.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = MyIdentityData.BlogPolicy_Edit)]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Body,Summary,Posted")] BlogPostModel blogPostModel)
         {
-            if (id != blogPostModel.Id)
+            if (!id.Equals(blogPostModel.Id))
             {
                 return NotFound();
             }
@@ -117,6 +126,7 @@ namespace HW_03WebII.Controllers
         }
 
         // GET: BlogPost/Delete/5
+        [Authorize(Policy = MyIdentityData.BlogPolicy_Delete)]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -125,7 +135,7 @@ namespace HW_03WebII.Controllers
             }
 
             var blogPostModel = await _context.BlogPosts
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Id.Equals(id));
             if (blogPostModel == null)
             {
                 return NotFound();
@@ -137,6 +147,7 @@ namespace HW_03WebII.Controllers
         // POST: BlogPost/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = MyIdentityData.BlogPolicy_Delete)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var blogPostModel = await _context.BlogPosts.FindAsync(id);
@@ -145,9 +156,9 @@ namespace HW_03WebII.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool BlogPostModelExists(int id)
+        private bool BlogPostModelExists(string id)
         {
-            return _context.BlogPosts.Any(e => e.Id == id);
+            return _context.BlogPosts.Any(e => e.Id.Equals(id));
         }
     }
 }

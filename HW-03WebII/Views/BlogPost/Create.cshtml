@@ -1,4 +1,4 @@
-﻿@model HW_03WebII.Models.BlogPostModel
+﻿@model BlogPostModel
 
 @{
     ViewData["Title"] = "Create";
@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
@@ -29,6 +29,7 @@
             </div>
             <div class="form-group">
                 <input asp-for="Posted" class="form-control" type="hidden" value="@DateTime.Now" />
+                <input asp-for="Id" class="form-control" type="hidden" value="1" />
                 <span asp-validation-for="Posted" class="text-danger"></span>
             </div>
             <div class="form-group">

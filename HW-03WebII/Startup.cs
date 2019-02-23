@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using HW_03WebII.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using HW_03WebII.Models;
 
 namespace HW_03WebII
 {
@@ -28,6 +29,23 @@ namespace HW_03WebII
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultUI(UIFramework.Bootstrap4)
+                .AddDefaultTokenProviders();
+
+            services.AddAuthorization(o =>
+            {
+                o.AddPolicy(MyIdentityData.BlogPolicy_Add, p => p.RequireRole(MyIdentityData.AdminRoleName, MyIdentityData.EditorRoleName, MyIdentityData.ContributorRoleName));
+                o.AddPolicy(MyIdentityData.BlogPolicy_Edit, p => p.RequireRole(MyIdentityData.AdminRoleName, MyIdentityData.EditorRoleName));
+                o.AddPolicy(MyIdentityData.BlogPolicy_Delete, p => p.RequireRole(MyIdentityData.AdminRoleName));
+            });
+
+            
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -35,23 +53,22 @@ namespace HW_03WebII
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddDefaultUI(UIFramework.Bootstrap4)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            
+            //services.AddDefaultIdentity<IdentityUser>()
+            //    .AddDefaultUI(UIFramework.Bootstrap4)
+            //    .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-        }
+}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
+                
             }
             else
             {
@@ -63,9 +80,9 @@ namespace HW_03WebII
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
+            
             app.UseAuthentication();
-
+            MyIdentityData.SeedData(userManager, roleManager);
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
