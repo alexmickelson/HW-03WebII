@@ -15,9 +15,11 @@ namespace HW_03WebII.Models
         public string Body { get; set; }
         public string Summary { get; set; }
         public DateTime Posted { get; set; }
-        
+
         [NotMapped]
         public string Tags { get; set; }
+        [NotMapped]
+        public List<TagModel> TagArray { get; set; }
 
         public List<BlogTags> BlogTags { get; set; }
 
