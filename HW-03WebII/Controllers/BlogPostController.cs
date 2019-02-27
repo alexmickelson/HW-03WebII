@@ -78,12 +78,18 @@ namespace HW_03WebII.Controllers
                     var tags = blogPostModel.Tags.Split();
                     foreach(var tag in tags)
                     {
-                        var dbTag = new TagModel() { Name = tag };
-                        _context.Add(dbTag);
+                        var dbTag = await _context.Tags.FindAsync(tag);
+
+                        if (dbTag.Name.Equals(null))
+                        {
+                            dbTag = new TagModel() { Name = tag };
+                            _context.Add(dbTag);
+                        }
+
                         blogPostModel.BlogTags.Add(new BlogTags()
                         {
                             BlogId = blogPostModel.Id,
-                            Tag=dbTag
+                            Tag = dbTag
                         });
                         await _context.SaveChangesAsync();
                     }
@@ -103,7 +109,40 @@ namespace HW_03WebII.Controllers
                         .ToListAsync();
         }
 
-        
+        public async Task<List<BlogPostModel>> getPostsAsync(string tag)
+        {
+            var tags = await _context.Tags
+                                .Include(t => t.BlogTags) 
+                                .ToListAsync();
+            var blogs = new List<BlogPostModel>();
+            if (!tags.Equals(null))
+            {
+                foreach(var t in tags)
+                {
+                    if (!t.BlogTags.Equals(null))
+                    {
+                        foreach (var bt in t.BlogTags)
+                        {
+                            var dbBlog = await _context.BlogPosts.FindAsync(bt.BlogId);
+                            dbBlog.TagArray = await GetTagsAsync(dbBlog);
+                            blogs.Add(dbBlog);
+                        }
+                    }
+                }
+            }
+
+            return blogs;
+        }
+
+        public async Task<List<TagModel>> GetTagsAsync(BlogPostModel blogPost)
+        {
+            var allTags =  await _context.Tags
+                        .Include(t => t.BlogTags)
+                        .ToListAsync();
+            var s = allTags.Where(t => t.BlogTags.TrueForAll(bt => bt.BlogId == blogPost.Id));
+            return s.ToList();
+            
+        }
 
         // GET: BlogPost/Edit/5
         [Authorize(Policy = MyIdentityData.BlogPolicy_Edit)]
