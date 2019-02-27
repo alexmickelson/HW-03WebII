@@ -37,6 +37,31 @@ namespace HW_03WebII.Migrations
                     b.ToTable("BlogPosts");
                 });
 
+            modelBuilder.Entity("HW_03WebII.Models.BlogTags", b =>
+                {
+                    b.Property<string>("BlogId")
+                        .HasColumnName("blogid");
+
+                    b.Property<string>("TagId")
+                        .HasColumnName("tagid");
+
+                    b.HasKey("BlogId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("blogtags");
+                });
+
+            modelBuilder.Entity("HW_03WebII.Models.TagModel", b =>
+                {
+                    b.Property<string>("Name")
+                        .ValueGeneratedOnAdd();
+
+                    b.HasKey("Name");
+
+                    b.ToTable("Tags");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -196,6 +221,19 @@ namespace HW_03WebII.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("HW_03WebII.Models.BlogTags", b =>
+                {
+                    b.HasOne("HW_03WebII.Models.BlogPostModel", "Blog")
+                        .WithMany("BlogTags")
+                        .HasForeignKey("BlogId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("HW_03WebII.Models.TagModel", "Tag")
+                        .WithMany("BlogTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

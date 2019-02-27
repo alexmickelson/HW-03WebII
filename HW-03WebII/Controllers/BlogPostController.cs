@@ -70,11 +70,40 @@ namespace HW_03WebII.Controllers
             {
                 GenerateSlug(blogPostModel);
                 _context.Add(blogPostModel);
+
+                if (!blogPostModel.Tags.Equals(null))
+                {
+                    blogPostModel.BlogTags = new List<BlogTags>();
+
+                    var tags = blogPostModel.Tags.Split();
+                    foreach(var tag in tags)
+                    {
+                        var dbTag = new TagModel() { Name = tag };
+                        _context.Add(dbTag);
+                        blogPostModel.BlogTags.Add(new BlogTags()
+                        {
+                            BlogId = blogPostModel.Id,
+                            Tag=dbTag
+                        });
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(blogPostModel);
         }
+
+        public async Task<List<TagModel>> GetTagsAsync()
+        {
+            return await _context.Tags
+                        .Include(t => t.BlogTags)
+                        .ToListAsync();
+        }
+
+        
 
         // GET: BlogPost/Edit/5
         [Authorize(Policy = MyIdentityData.BlogPolicy_Edit)]
@@ -177,14 +206,13 @@ namespace HW_03WebII.Controllers
             // cut and trim 
             str = str.Substring(0, str.Length <= 45 ? str.Length : 45).Trim();
             str = Regex.Replace(str, @"\s", "-"); // hyphens 
+
             blogPost.Id = str;  
 
             //check if exists
             int extraId = 0;
-            string id;
             while (BlogPostModelExists(blogPost.Id))
             {
-                id = blogPost.Id;
                 var numbers = Regex.Matches(blogPost.Id, @"\d+").ToList();
                 if (numbers.Any())
                 {

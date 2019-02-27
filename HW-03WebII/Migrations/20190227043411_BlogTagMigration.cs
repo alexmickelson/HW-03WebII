@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace HW_03WebII.Migrations
 {
-    public partial class blogmigration : Migration
+    public partial class BlogTagMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -60,6 +60,17 @@ namespace HW_03WebII.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_BlogPosts", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tags",
+                columns: table => new
+                {
+                    Name = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tags", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
@@ -168,6 +179,30 @@ namespace HW_03WebII.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "blogtags",
+                columns: table => new
+                {
+                    blogid = table.Column<string>(nullable: false),
+                    tagid = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_blogtags", x => new { x.blogid, x.tagid });
+                    table.ForeignKey(
+                        name: "FK_blogtags_BlogPosts_blogid",
+                        column: x => x.blogid,
+                        principalTable: "BlogPosts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_blogtags_Tags_tagid",
+                        column: x => x.tagid,
+                        principalTable: "Tags",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -206,6 +241,11 @@ namespace HW_03WebII.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_blogtags_tagid",
+                table: "blogtags",
+                column: "tagid");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -226,13 +266,19 @@ namespace HW_03WebII.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "BlogPosts");
+                name: "blogtags");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "BlogPosts");
+
+            migrationBuilder.DropTable(
+                name: "Tags");
         }
     }
 }
