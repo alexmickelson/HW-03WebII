@@ -80,7 +80,7 @@ namespace HW_03WebII.Controllers
                     {
                         var dbTag = await _context.Tags.FindAsync(tag);
 
-                        if (dbTag.Name.Equals(null))
+                        if (dbTag ==null)
                         {
                             dbTag = new TagModel() { Name = tag };
                             _context.Add(dbTag);
