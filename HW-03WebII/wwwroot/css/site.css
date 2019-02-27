@@ -10,7 +10,7 @@ a.navbar-brand {
 -------------------------------------------------- */
 html {
   font-size: 14px;
-  color: white;
+  
 }
 @media (min-width: 768px) {
   html {
@@ -40,12 +40,22 @@ html {
   position: relative;
   min-height: 100%;
 }
-
+div.text-center{
+    font-weight: 800;
+    padding-top: 10%;
+}
+.table th{
+    border-top: 0px solid;
+}
+.table thead th{
+    border-bottom: 0px;
+}
 
 body {
     /* Margin bottom by footer height */
     margin-bottom: 60px;
     background-color: #8d9093;
+    color: white;
 }
 .footer {
   position: absolute;
@@ -55,4 +65,16 @@ body {
   /* Set the fixed height of the footer here */
   height: 60px;
   line-height: 60px; /* Vertically center the text there */
+}
+a {
+    
+    color: #b8cbf2;
+}
+.col-md-4 {
+    -ms-flex: 0 0 33.333333%;
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+.formBody{
+    height: 30vh;
 }
