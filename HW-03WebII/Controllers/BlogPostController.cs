@@ -144,6 +144,32 @@ namespace HW_03WebII.Controllers
             return blogs;
         }
 
+        public async Task<IActionResult> getPosts(string tag)
+        {
+            var tags = await _context.Tags
+                                .Include(t => t.BlogTags) 
+                                .ToListAsync();
+            var blogs = new List<BlogPostModel>();
+            if (!tags.Equals(null))
+            {
+                foreach(var t in tags)
+                {
+                    if (!t.BlogTags.Equals(null))
+                    {
+                        foreach (var bt in t.BlogTags)
+                        {
+                            var dbBlog = await _context.BlogPosts.FindAsync(bt.BlogId);
+                            dbBlog.TagArray = await GetTagsAsync(dbBlog);
+                            blogs.Add(dbBlog);
+                        }
+                    }
+                }
+            }
+
+            ViewData["Tag"] = tag;
+            return View(blogs);
+        }
+
         // GET: BlogPost/Edit/5
         [Authorize(Policy = MyIdentityData.BlogPolicy_Edit)]
         public async Task<IActionResult> Edit(string id)
