@@ -48,6 +48,7 @@ namespace HW_03WebII.Controllers
             {
                 return NotFound();
             }
+            blogPostModel.TagArray = await GetTagsAsync(blogPostModel);
 
             return View(blogPostModel);
         }
@@ -108,6 +109,15 @@ namespace HW_03WebII.Controllers
                         .Include(t => t.BlogTags)
                         .ToListAsync();
         }
+        public async Task<List<TagModel>> GetTagsAsync(BlogPostModel blogPost)
+        {
+            var allTags = await _context.Tags
+                        .Include(t => t.BlogTags)
+                        .ToListAsync();
+            var s = allTags.Where(t => t.BlogTags.Exists(bt => bt.BlogId == blogPost.Id)).ToList();
+            return s;
+
+        }
 
         public async Task<List<BlogPostModel>> getPostsAsync(string tag)
         {
@@ -132,16 +142,6 @@ namespace HW_03WebII.Controllers
             }
 
             return blogs;
-        }
-
-        public async Task<List<TagModel>> GetTagsAsync(BlogPostModel blogPost)
-        {
-            var allTags =  await _context.Tags
-                        .Include(t => t.BlogTags)
-                        .ToListAsync();
-            var s = allTags.Where(t => t.BlogTags.TrueForAll(bt => bt.BlogId == blogPost.Id));
-            return s.ToList();
-            
         }
 
         // GET: BlogPost/Edit/5

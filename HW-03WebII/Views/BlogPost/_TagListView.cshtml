@@ -1,0 +1,11 @@
+﻿@model List<TagModel>
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<ul class="tagList">
+    @foreach(var tag in Model)
+    {
+        <li class="tagListItem">@tag.Name</li>
+    }
+</ul>

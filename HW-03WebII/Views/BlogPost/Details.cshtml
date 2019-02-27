@@ -1,4 +1,4 @@
-﻿@model HW_03WebII.Models.BlogPostModel
+﻿@model BlogPostModel
 
 @{
     ViewData["Title"] = "Details";
@@ -39,4 +39,8 @@
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
+</div>
+
+<div>
+    @Html.Partial("_TagListView", Model.TagArray)
 </div>
