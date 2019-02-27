@@ -148,7 +148,9 @@ namespace HW_03WebII.Controllers
         {
             var myTag = await _context.Tags
                                 .Include(t => t.BlogTags) 
+                                .Where(t => t.Name == tag)
                                 .FirstAsync();
+
             var blogs = new List<BlogPostModel>();
             if (!myTag.Equals(null))
             {

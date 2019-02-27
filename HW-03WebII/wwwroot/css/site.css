@@ -1,5 +1,4 @@
-﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-for details on configuring this project to bundle and minify static web assets. */
+﻿
 
 a.navbar-brand {
   white-space: normal;
@@ -92,4 +91,39 @@ h1 {
 
 .blogRow:hover{
     color: black;
+}
+
+
+.btn-primary {
+    background-color: #5d719a;
+    border-color: #5d719a;
+    margin: .5em;
+}
+    .btn-primary:hover {
+        background-color: #465573;
+        border-color: #465573;
+    }
+
+hr {
+    color: white;
+}
+
+.blogSummary{
+    margin-left: 3em;
+}
+
+
+.blogBody{
+  margin-top: 1em;
+  margin-bottom: 1em;
+  font-size: 1.5em;
+}
+.flex-container {
+  justify-content: flex-end;
+  display: flex;
+  font-size: 1.5em;
+}
+.basicText {
+  font-size: 1.5em;
+
 }

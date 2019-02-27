@@ -13,8 +13,8 @@
         
         @foreach (var item in Model)
         {
-            <tr class="blogRow" onclick="window.location='https://localhost:5001/BlogPost/Details/@item.Id'">
-                <td>
+            <tr class="blogRow">
+                <td onclick="location.href='/BlogPost/Details/@item.Id'">
                     <table>
                         <tr class="blogTitle">
                             <h3>@Html.DisplayFor(modelItem => item.Title)</h3>
@@ -25,21 +25,28 @@
                     </table>
                 </td>
 
-                <td>
+                <td onclick="location.href='/BlogPost/Details/@item.Id'">
                     @Html.DisplayFor(modelItem => item.Summary)
                 </td>
 
-                <td>
+                <td onclick="location.href='/BlogPost/Details/@item.Id'">
                     @Html.DisplayFor(modelItem => item.Body)
                 </td>
                 <td>
-                    @if (@canEdit != false)
+                    @if (canEdit)
                     {
-                        <a asp-action="Edit" asp-route-id="@item.Id"> Edit </a>
+                        <input type="button"
+                               value="Edit Post"
+                               class="btn btn-primary"
+                               onclick="location.href='@Url.Action("Edit", "BlogPost", new { id = item.Id})'" />
                     }
-                    @if (@canDelete != false)
+                    @if (canDelete)
                     {
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+
+                        <input type="button"
+                               value="Delete Post"
+                               class="btn btn-primary"
+                               onclick="location.href='@Url.Action("Delete", "BlogPost", new { id = item.Id})'" />
                     }
                 </td>
             </tr>

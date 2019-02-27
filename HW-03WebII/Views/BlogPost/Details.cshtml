@@ -3,6 +3,12 @@
 @{
     ViewData["Title"] = "Details";
 }
+@inject IAuthorizationService Authorization
+@{
+    var canEdit = (await Authorization.AuthorizeAsync(User, MyIdentityData.BlogPolicy_Edit)).Succeeded;
+    var canDelete = (await Authorization.AuthorizeAsync(User, MyIdentityData.BlogPolicy_Delete)).Succeeded;
+    var canAdd = (await Authorization.AuthorizeAsync(User, MyIdentityData.BlogPolicy_Add)).Succeeded;
+}
 
 
 <div>
@@ -12,24 +18,35 @@
 
     </div>
     <hr />
-    <div class="blogSummary">
-        <div>
-            @Html.DisplayNameFor(m => m.Summary)
-
-        </div>
-        <div>
-            @Html.DisplayFor(m => m.Summary)
-        </div>
+    <div class="blogSummary basicText">
+        @Html.DisplayFor(m => m.Summary)
     </div>
-    <div class="blogBody">
-        <div>
-            @Html.DisplayFor(m => m.Body)
-        </div>
+    <div class="blogBody basicText">
+        @Html.DisplayFor(m => m.Body)
     </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Pack to Posts</a>
+<div class="flex-container">
+    @if (canEdit)
+    {
+        <input type="button"
+               value="Edit Post"
+               class="btn btn-primary"
+               onclick="location.href='@Url.Action("Edit", "BlogPost", new { id = Model.Id})'" />
+    }
+    @if (canDelete)
+    {
+
+        <input type="button"
+               value="Delete Post"
+               class="btn btn-primary"
+               onclick="location.href='@Url.Action("Delete", "BlogPost", new { id = Model.Id})'" />
+    }
+
+        <input type="button"
+               value="Back to Posts"
+               class="btn btn-primary"
+               onclick="location.href='@Url.Action("Index", "BlogPost")'" />
+    
 </div>
 
 <div>
