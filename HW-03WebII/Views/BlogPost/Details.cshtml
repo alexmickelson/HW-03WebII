@@ -4,43 +4,35 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
 
 <div>
-    <h4>BlogPostModel</h4>
+    <div class="blogTitle">
+        <h1>@Html.DisplayFor(model => model.Title)</h1>
+        <h4>@Html.DisplayFor(model => model.Posted)</h4>
+
+    </div>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Body)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Body)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Summary)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Summary)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Posted)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Posted)
-        </dd>
-    </dl>
+    <div class="blogSummary">
+        <div>
+            @Html.DisplayNameFor(m => m.Summary)
+
+        </div>
+        <div>
+            @Html.DisplayFor(m => m.Summary)
+        </div>
+    </div>
+    <div class="blogBody">
+        <div>
+            @Html.DisplayFor(m => m.Body)
+        </div>
+    </div>
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Pack to Posts</a>
 </div>
 
 <div>
+    <p>Tags:</p>
     @Html.Partial("_TagListView", Model.TagArray)
 </div>

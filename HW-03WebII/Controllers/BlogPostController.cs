@@ -146,27 +146,24 @@ namespace HW_03WebII.Controllers
 
         public async Task<IActionResult> getPosts(string tag)
         {
-            var tags = await _context.Tags
+            var myTag = await _context.Tags
                                 .Include(t => t.BlogTags) 
-                                .ToListAsync();
+                                .FirstAsync();
             var blogs = new List<BlogPostModel>();
-            if (!tags.Equals(null))
+            if (!myTag.Equals(null))
             {
-                foreach(var t in tags)
+                if (!myTag.BlogTags.Equals(null))
                 {
-                    if (!t.BlogTags.Equals(null))
+                    foreach (var bt in myTag.BlogTags)
                     {
-                        foreach (var bt in t.BlogTags)
-                        {
-                            var dbBlog = await _context.BlogPosts.FindAsync(bt.BlogId);
-                            dbBlog.TagArray = await GetTagsAsync(dbBlog);
-                            blogs.Add(dbBlog);
-                        }
+                        var dbBlog = await _context.BlogPosts.FindAsync(bt.BlogId);
+                        //dbBlog.TagArray = await GetTagsAsync(dbBlog);
+                        blogs.Add(dbBlog);
                     }
                 }
             }
 
-            ViewData["Tag"] = tag;
+            ViewData["Tag"] = myTag.Name;
             return View(blogs);
         }
 

@@ -1,0 +1,8 @@
+﻿@model  List<BlogPostModel>
+@{
+    ViewData["Title"] = "getPostsView";
+}
+
+<h1>TAG: @ViewData["Tag"]</h1>
+
+@Html.Partial("_BlogTableView", Model)
